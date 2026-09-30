@@ -8,7 +8,7 @@ async def async_setup_entry(hass, entry, async_add_entities):
 
 class HeatGuardClimate(CoordinatorEntity, ClimateEntity):
     _attr_has_entity_name = True
-    _attr_name = "Water temperature"
+    _attr_name = "Теплоноситель"
     _attr_temperature_unit = UnitOfTemperature.CELSIUS
     _attr_target_temperature_step = 1
     _attr_hvac_modes = [HVACMode.OFF, HVACMode.HEAT, HVACMode.COOL]
@@ -39,7 +39,9 @@ class HeatGuardClimate(CoordinatorEntity, ClimateEntity):
         return 55 if self.settings["id_60"] == "1" else 20
     @property
     def extra_state_attributes(self):
-        return {"control_enabled": self.coordinator.api.allow_control, "device_time": self.coordinator.data["device_time"], "temperature_context": "controller current temperature; not confirmed room temperature"}
+        return {"control_enabled": self.coordinator.api.allow_control, "device_time": self.coordinator.data["device_time"], "temperature_context": "controller current temperature; not confirmed room temperature",
+                "command_pending": self.coordinator.data.get("command_pending", False),
+                "command_confirmation_failed": self.coordinator.data.get("command_confirmation_failed", False)}
     async def async_set_hvac_mode(self, hvac_mode):
         if hvac_mode not in self._attr_hvac_modes:
             raise ValueError("Unsupported HVAC mode")

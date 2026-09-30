@@ -1,5 +1,6 @@
 """RemoteGuard web client with serialized, opt-in commands."""
 import asyncio
+import time
 import aiohttp
 from .parser import parse_account, validate
 
@@ -15,6 +16,19 @@ class RemoteGuard:
         self.session = aiohttp.ClientSession(timeout=aiohttp.ClientTimeout(total=30))
         self.lock = asyncio.Lock()
         self.logged_in = False
+        self.pending = {}
+        self.pending_until = 0
+
+    def _with_pending(self, data):
+        """Keep acknowledged commands visible while the cloud form catches up."""
+        pending = getattr(self, "pending", {})
+        if pending and all(str(data["settings"][key]) == value for key, value in pending.items()):
+            self.pending = pending = {}
+        expired = bool(pending) and time.monotonic() >= self.pending_until
+        if expired:
+            self.pending = pending = {}
+        return {**data, "settings": {**data["settings"], **pending},
+                "command_pending": bool(pending), "command_confirmation_failed": expired}
 
     async def close(self):
         await self.session.close()
@@ -48,7 +62,7 @@ class RemoteGuard:
 
     async def read(self):
         async with self.lock:
-            return await self._account()
+            return self._with_pending(await self._account())
 
     async def write(self, changes):
         if not self.allow_control:
@@ -57,7 +71,7 @@ class RemoteGuard:
             raise RemoteGuardError("Only power, heating/cooling and their setpoints are exposed")
         async with self.lock:
             # The UI sends the entire form: refresh it before every write.
-            current = await self._account()
+            current = self._with_pending(await self._account())
             payload = dict(current["settings"])
             changes = dict(changes)
             if "target_temperature" in changes:
@@ -90,5 +104,8 @@ class RemoteGuard:
                     return confirmed
             if not isinstance(result, dict) or result.get("error") or not result.get("success"):
                 raise RemoteGuardError("RemoteGuard did not acknowledge command: " + str(result)[:300])
-            # A server acknowledgement does not establish that the pump applied it.
-            return await self._account()
+            # The immediate GET can contain the previous form. Publish the
+            # acknowledged command and confirm it on subsequent polls instead.
+            self.pending = {**getattr(self, "pending", {}), **{key: payload[key] for key in changes}}
+            self.pending_until = time.monotonic() + 120
+            return self._with_pending(current)

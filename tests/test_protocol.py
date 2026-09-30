@@ -3,6 +3,7 @@ import importlib.util
 from pathlib import Path
 import sys
 import types
+import time
 import unittest
 
 ROOT = Path(__file__).resolve().parents[1] / 'custom_components' / 'heatguard'
@@ -121,6 +122,37 @@ class WriteTests(unittest.IsolatedAsyncioTestCase):
                     with self.assertRaises(RemoteGuardError):
                         await api.write({'id_59':'1'})
                 self.assertEqual(len(self.sent), 1)
+
+    async def test_acknowledged_mode_survives_stale_poll_and_next_command(self):
+        api = self.client()
+        result = await api.write({'id_59':'1', 'id_60':'0'})
+        self.assertEqual(result['settings']['id_59'], '1')
+        self.assertEqual(result['settings']['id_60'], '0')
+        self.assertTrue(result['command_pending'])
+        stale = await api.read()
+        self.assertEqual(stale['settings']['id_60'], '0')
+        await api.write({'target_temperature':'18'})
+        self.assertEqual(self.sent[-1][2]['data']['id_60'], '0')
+        self.assertEqual(self.sent[-1][2]['data']['id_61'], '18')
+
+    async def test_pending_clears_only_when_cloud_matches(self):
+        api = self.client()
+        await api.write({'id_59':'1'})
+        async def account():
+            return {'settings':{**SETTINGS, 'id_59':'1'}}
+        api._account = account
+        confirmed = await api.read()
+        self.assertFalse(confirmed['command_pending'])
+        self.assertFalse(confirmed['command_confirmation_failed'])
+
+    async def test_expired_confirmation_reverts_to_cloud(self):
+        api = self.client()
+        await api.write({'id_59':'1'})
+        api.pending_until = time.monotonic() - 1
+        expired = await api.read()
+        self.assertEqual(expired['settings']['id_59'], '0')
+        self.assertFalse(expired['command_pending'])
+        self.assertTrue(expired['command_confirmation_failed'])
 
 if __name__ == '__main__':
     unittest.main()

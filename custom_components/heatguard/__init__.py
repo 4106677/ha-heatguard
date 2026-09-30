@@ -1,4 +1,5 @@
 from datetime import timedelta
+import asyncio
 import aiohttp
 from homeassistant.const import Platform
 from homeassistant.exceptions import ConfigEntryNotReady
@@ -15,18 +16,34 @@ class HeatGuardCoordinator(DataUpdateCoordinator):
         super().__init__(hass, logging.getLogger(__name__), name=DOMAIN,
                          config_entry=entry, update_interval=timedelta(seconds=60))
         self.api = api
+        self.write_lock = asyncio.Lock()
     async def _async_update_data(self):
         try:
-            return await self.api.read()
+            async with self.write_lock:
+                return await self.api.read()
         except (aiohttp.ClientError, TimeoutError, RemoteGuardError, ParseError, ValueError) as err:
             raise UpdateFailed("Cannot read RemoteGuard account") from err
     async def write(self, changes):
         from homeassistant.exceptions import HomeAssistantError
-        try:
-            data = await self.api.write(changes)
-        except (aiohttp.ClientError, TimeoutError, RemoteGuardError, ValueError) as err:
-            raise HomeAssistantError(f"RemoteGuard command failed or outcome is unconfirmed: {err}") from err
-        self.async_set_updated_data(data)
+        async with self.write_lock:
+            previous = self.data
+            preview = dict(previous["settings"])
+            requested = dict(changes)
+            if "target_temperature" in requested:
+                key = "id_62" if preview["id_60"] == "1" else "id_61"
+                requested[key] = requested.pop("target_temperature")
+            preview.update({key: str(value) for key, value in requested.items()})
+            self.async_set_updated_data({**previous, "settings": preview, "command_pending": True,
+                                         "command_confirmation_failed": False})
+            try:
+                data = await self.api.write(changes)
+            except (aiohttp.ClientError, TimeoutError, RemoteGuardError, ParseError, ValueError) as err:
+                self.async_set_updated_data(previous)
+                raise HomeAssistantError(f"RemoteGuard command failed or outcome is unconfirmed: {err}") from err
+            except asyncio.CancelledError:
+                self.async_set_updated_data(previous)
+                raise
+            self.async_set_updated_data(data)
 
 async def async_setup_entry(hass, entry):
     settings = dict(entry.data)

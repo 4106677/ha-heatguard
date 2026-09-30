@@ -20,6 +20,10 @@ This is a HACS custom repository; it has not been added to HACS's default catalo
 
 Add the built-in **HomeKit Bridge** integration and include the HeatGuard climate entity plus the temperature sensors you want. Pair that bridge in Apple Home while your phone can reach the bridge on the local network. The climate temperature is the controller's water temperature; do not assume it is room temperature.
 
+## Version 0.2.1
+
+Climate mode and setpoint update immediately when a command is sent. Failed commands restore the previous display and raise an error. Acknowledged commands remain visible while the RemoteGuard form catches up, instead of reverting to an old mode. `command_pending` indicates that confirmation is still pending; after 120 seconds without a matching form, the cloud settings are restored and `command_confirmation_failed` is set. This does not confirm compressor operation. The climate entity is named «Теплоноситель»; its existing entity ID stays unchanged.
+
 ## Version 0.2.0
 
 Repeated power, mode or setpoint commands now refresh the settings and skip unchanged writes. The RemoteGuard “Нет данных какие нужно изменить!” response is accepted only if a fresh read confirms the requested settings. Ambiguous commands are never automatically retried.
