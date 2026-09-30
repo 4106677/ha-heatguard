@@ -1,0 +1,36 @@
+{
+  "title": "IVIK HeatGuard RemoteGuard",
+  "config": {
+    "step": {
+      "user": {
+        "title": "RemoteGuard account",
+        "description": "Experimental cloud integration. Start with control disabled; the write endpoint has not been live-verified.",
+        "data": {
+          "email": "Email",
+          "password": "Password",
+          "uid": "Device UID",
+          "allow_control": "Enable experimental control"
+        }
+      }
+    },
+    "error": {
+      "invalid_auth": "Login failed",
+      "cannot_connect": "Cannot connect to RemoteGuard",
+      "invalid_device": "Device not found or page format changed"
+    },
+    "abort": {
+      "already_configured": "Device already configured"
+    }
+  },
+  "options": {
+    "step": {
+      "init": {
+        "title": "HeatGuard control",
+        "description": "Enable or disable control without entering the RemoteGuard password again.",
+        "data": {
+          "allow_control": "Enable experimental control"
+        }
+      }
+    }
+  }
+}

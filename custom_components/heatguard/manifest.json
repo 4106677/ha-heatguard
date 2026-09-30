@@ -1,0 +1,14 @@
+{
+  "domain": "heatguard",
+  "name": "IVIK HeatGuard RemoteGuard",
+  "version": "0.2.0",
+  "config_flow": true,
+  "documentation": "https://github.com/4106677/ha-heatguard",
+  "iot_class": "cloud_polling",
+  "requirements": [],
+  "codeowners": [
+    "@4106677"
+  ],
+  "issue_tracker": "https://github.com/4106677/ha-heatguard/issues",
+  "integration_type": "device"
+}
