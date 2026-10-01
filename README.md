@@ -19,8 +19,10 @@ This is a HACS custom repository; it has not been added to HACS's default catalo
 ## Interface languages
 
 English, Russian, and Ukrainian translations are included for setup, options,
-entity names, and service errors. Home Assistant selects the language from its
-interface settings. The climate entity is named **Coolant**, **Теплоноситель**,
+entity names, and service errors. Setup, options, and service errors follow the
+user's interface language. Home Assistant generates standard entity names using
+its system language (Settings → System → General), shared across users, rather
+than each user's interface language. The climate entity is named **Coolant**, **Теплоноситель**,
 or **Теплоносій**. Existing entity IDs and unique IDs are preserved.
 
 Names explicitly assigned by users or in dashboard YAML take precedence over
