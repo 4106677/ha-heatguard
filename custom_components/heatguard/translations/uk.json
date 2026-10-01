@@ -1,0 +1,88 @@
+{
+  "config": {
+    "step": {
+      "user": {
+        "title": "Обліковий запис RemoteGuard",
+        "description": "Підключіть HeatGuard за допомогою облікового запису RemoteGuard та UID пристрою. Увімкніть керування, щоб змінювати режим роботи й задану температуру.",
+        "data": {
+          "email": "Електронна пошта",
+          "password": "Пароль",
+          "uid": "UID пристрою",
+          "allow_control": "Дозволити керування"
+        }
+      }
+    },
+    "error": {
+      "invalid_auth": "Не вдалося увійти",
+      "cannot_connect": "Не вдалося підключитися до RemoteGuard",
+      "invalid_device": "Пристрій не знайдено або формат сторінки змінився"
+    },
+    "abort": {
+      "already_configured": "Пристрій уже налаштовано"
+    }
+  },
+  "options": {
+    "step": {
+      "init": {
+        "title": "Керування HeatGuard",
+        "description": "Увімкніть або вимкніть керування без повторного введення пароля RemoteGuard.",
+        "data": {
+          "allow_control": "Дозволити керування"
+        }
+      }
+    }
+  },
+  "entity": {
+    "climate": {
+      "coolant": {
+        "name": "Теплоносій"
+      }
+    },
+    "sensor": {
+      "current_temperature": {
+        "name": "Теплоносій"
+      },
+      "outdoor_temperature": {
+        "name": "Зовнішня температура"
+      },
+      "dhw_temperature_raw": {
+        "name": "Температура ГВП (початкова)"
+      },
+      "efficiency_reported": {
+        "name": "Ефективність (за даними контролера)"
+      },
+      "power": {
+        "name": "Потужність"
+      },
+      "heating_energy": {
+        "name": "Теплова енергія під час нагрівання"
+      },
+      "heating_electricity": {
+        "name": "Електроенергія під час нагрівання"
+      },
+      "cooling_energy": {
+        "name": "Енергія охолодження"
+      },
+      "cooling_electricity": {
+        "name": "Електроенергія під час охолодження"
+      },
+      "hours_until_service": {
+        "name": "Час до обслуговування"
+      }
+    }
+  },
+  "exceptions": {
+    "command_failed": {
+      "message": "Команду RemoteGuard не виконано або результат не підтверджено: {detail}"
+    },
+    "unsupported_hvac_mode": {
+      "message": "Непідтримуваний режим роботи."
+    },
+    "combined_mode_temperature": {
+      "message": "Спочатку задайте режим роботи, потім задану температуру."
+    },
+    "cannot_read": {
+      "message": "Не вдалося прочитати дані облікового запису RemoteGuard."
+    }
+  }
+}

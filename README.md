@@ -16,6 +16,16 @@ Requires Home Assistant 2026.9 or newer. Tested with Core 2026.9.4 and one HeatG
 
 This is a HACS custom repository; it has not been added to HACS's default catalog. Each user supplies their own account and device UID. Multiple devices can be configured separately.
 
+## Interface languages
+
+English, Russian, and Ukrainian translations are included for setup, options,
+entity names, and service errors. Home Assistant selects the language from its
+interface settings. The climate entity is named **Coolant**, **Теплоноситель**,
+or **Теплоносій**. Existing entity IDs and unique IDs are preserved.
+
+Names explicitly assigned by users or in dashboard YAML take precedence over
+translated names. Remove such overrides to use automatic translations.
+
 ## HomeKit
 
 Add the built-in **HomeKit Bridge** integration and include the HeatGuard climate entity plus the temperature sensors you want. Pair that bridge in Apple Home while your phone can reach the bridge on the local network. The climate temperature is the controller's water temperature; do not assume it is room temperature.

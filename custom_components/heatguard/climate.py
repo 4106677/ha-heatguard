@@ -1,5 +1,6 @@
 from homeassistant.components.climate import ClimateEntity, ClimateEntityFeature, HVACMode
 from homeassistant.const import ATTR_TEMPERATURE, UnitOfTemperature
+from homeassistant.exceptions import ServiceValidationError
 from homeassistant.helpers.update_coordinator import CoordinatorEntity
 from . import DOMAIN
 
@@ -8,7 +9,7 @@ async def async_setup_entry(hass, entry, async_add_entities):
 
 class HeatGuardClimate(CoordinatorEntity, ClimateEntity):
     _attr_has_entity_name = True
-    _attr_name = "Теплоноситель"
+    _attr_translation_key = "coolant"
     _attr_temperature_unit = UnitOfTemperature.CELSIUS
     _attr_target_temperature_step = 1
     _attr_hvac_modes = [HVACMode.OFF, HVACMode.HEAT, HVACMode.COOL]
@@ -44,7 +45,7 @@ class HeatGuardClimate(CoordinatorEntity, ClimateEntity):
                 "command_confirmation_failed": self.coordinator.data.get("command_confirmation_failed", False)}
     async def async_set_hvac_mode(self, hvac_mode):
         if hvac_mode not in self._attr_hvac_modes:
-            raise ValueError("Unsupported HVAC mode")
+            raise ServiceValidationError(translation_domain=DOMAIN, translation_key="unsupported_hvac_mode")
         changes = {"id_59": "0"} if hvac_mode == HVACMode.OFF else {"id_59": "1", "id_60": "1" if hvac_mode == HVACMode.HEAT else "0"}
         await self.coordinator.write(changes)
     async def async_set_temperature(self, **kwargs):
@@ -54,7 +55,7 @@ class HeatGuardClimate(CoordinatorEntity, ClimateEntity):
         # Select the register from a fresh form inside the write transaction.
         # Reject combined mode+temperature calls rather than using the wrong range.
         if kwargs.get("hvac_mode") is not None:
-            raise ValueError("Set HVAC mode separately, then set temperature")
+            raise ServiceValidationError(translation_domain=DOMAIN, translation_key="combined_mode_temperature")
         await self.coordinator.write({"target_temperature": str(temperature)})
     async def async_turn_off(self):
         await self.coordinator.write({"id_59": "0"})

@@ -1,0 +1,88 @@
+{
+  "config": {
+    "step": {
+      "user": {
+        "title": "Учётная запись RemoteGuard",
+        "description": "Подключите HeatGuard с помощью учётной записи RemoteGuard и UID устройства. Включите управление, чтобы менять режим работы и заданную температуру.",
+        "data": {
+          "email": "Электронная почта",
+          "password": "Пароль",
+          "uid": "UID устройства",
+          "allow_control": "Разрешить управление"
+        }
+      }
+    },
+    "error": {
+      "invalid_auth": "Не удалось войти",
+      "cannot_connect": "Не удалось подключиться к RemoteGuard",
+      "invalid_device": "Устройство не найдено или формат страницы изменился"
+    },
+    "abort": {
+      "already_configured": "Устройство уже настроено"
+    }
+  },
+  "options": {
+    "step": {
+      "init": {
+        "title": "Управление HeatGuard",
+        "description": "Включите или отключите управление без повторного ввода пароля RemoteGuard.",
+        "data": {
+          "allow_control": "Разрешить управление"
+        }
+      }
+    }
+  },
+  "entity": {
+    "climate": {
+      "coolant": {
+        "name": "Теплоноситель"
+      }
+    },
+    "sensor": {
+      "current_temperature": {
+        "name": "Теплоноситель"
+      },
+      "outdoor_temperature": {
+        "name": "Наружная температура"
+      },
+      "dhw_temperature_raw": {
+        "name": "Температура ГВС (исходная)"
+      },
+      "efficiency_reported": {
+        "name": "Эффективность (по данным контроллера)"
+      },
+      "power": {
+        "name": "Мощность"
+      },
+      "heating_energy": {
+        "name": "Тепловая энергия при нагреве"
+      },
+      "heating_electricity": {
+        "name": "Электроэнергия при нагреве"
+      },
+      "cooling_energy": {
+        "name": "Энергия охлаждения"
+      },
+      "cooling_electricity": {
+        "name": "Электроэнергия при охлаждении"
+      },
+      "hours_until_service": {
+        "name": "Время до обслуживания"
+      }
+    }
+  },
+  "exceptions": {
+    "command_failed": {
+      "message": "Команда RemoteGuard не выполнена или результат не подтверждён: {detail}"
+    },
+    "unsupported_hvac_mode": {
+      "message": "Неподдерживаемый режим работы."
+    },
+    "combined_mode_temperature": {
+      "message": "Сначала задайте режим работы, затем заданную температуру."
+    },
+    "cannot_read": {
+      "message": "Не удалось прочитать данные учётной записи RemoteGuard."
+    }
+  }
+}

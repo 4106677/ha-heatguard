@@ -1,15 +1,14 @@
 {
-  "title": "IVIK HeatGuard RemoteGuard",
   "config": {
     "step": {
       "user": {
         "title": "RemoteGuard account",
-        "description": "Experimental cloud integration. Start with control disabled; the write endpoint has not been live-verified.",
+        "description": "Connect your HeatGuard using your RemoteGuard account and device UID. Enable control to change operating mode and target temperature.",
         "data": {
           "email": "Email",
           "password": "Password",
           "uid": "Device UID",
-          "allow_control": "Enable experimental control"
+          "allow_control": "Enable control"
         }
       }
     },
@@ -28,9 +27,62 @@
         "title": "HeatGuard control",
         "description": "Enable or disable control without entering the RemoteGuard password again.",
         "data": {
-          "allow_control": "Enable experimental control"
+          "allow_control": "Enable control"
         }
       }
+    }
+  },
+  "entity": {
+    "climate": {
+      "coolant": {
+        "name": "Coolant"
+      }
+    },
+    "sensor": {
+      "current_temperature": {
+        "name": "Coolant"
+      },
+      "outdoor_temperature": {
+        "name": "Outdoor temperature"
+      },
+      "dhw_temperature_raw": {
+        "name": "DHW temperature (raw)"
+      },
+      "efficiency_reported": {
+        "name": "Efficiency (reported)"
+      },
+      "power": {
+        "name": "Power"
+      },
+      "heating_energy": {
+        "name": "Heating energy"
+      },
+      "heating_electricity": {
+        "name": "Heating electricity"
+      },
+      "cooling_energy": {
+        "name": "Cooling energy"
+      },
+      "cooling_electricity": {
+        "name": "Cooling electricity"
+      },
+      "hours_until_service": {
+        "name": "Hours until service"
+      }
+    }
+  },
+  "exceptions": {
+    "command_failed": {
+      "message": "RemoteGuard command failed or its outcome could not be confirmed: {detail}"
+    },
+    "unsupported_hvac_mode": {
+      "message": "Unsupported operating mode."
+    },
+    "combined_mode_temperature": {
+      "message": "Set the operating mode first, then set the target temperature."
+    },
+    "cannot_read": {
+      "message": "Cannot read the RemoteGuard account."
     }
   }
 }

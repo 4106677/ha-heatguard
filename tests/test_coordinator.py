@@ -8,7 +8,9 @@ from unittest.mock import patch
 import test_protocol
 
 class HAError(Exception):
-    pass
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args)
+        self.translation = kwargs
 
 class CoordinatorStub:
     def __init__(self, *args, **kwargs):

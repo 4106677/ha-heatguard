@@ -22,7 +22,7 @@ class HeatGuardCoordinator(DataUpdateCoordinator):
             async with self.write_lock:
                 return await self.api.read()
         except (aiohttp.ClientError, TimeoutError, RemoteGuardError, ParseError, ValueError) as err:
-            raise UpdateFailed("Cannot read RemoteGuard account") from err
+            raise UpdateFailed(translation_domain=DOMAIN, translation_key="cannot_read") from err
     async def write(self, changes):
         from homeassistant.exceptions import HomeAssistantError
         async with self.write_lock:
@@ -39,7 +39,8 @@ class HeatGuardCoordinator(DataUpdateCoordinator):
                 data = await self.api.write(changes)
             except (aiohttp.ClientError, TimeoutError, RemoteGuardError, ParseError, ValueError) as err:
                 self.async_set_updated_data(previous)
-                raise HomeAssistantError(f"RemoteGuard command failed or outcome is unconfirmed: {err}") from err
+                raise HomeAssistantError(translation_domain=DOMAIN, translation_key="command_failed",
+                                         translation_placeholders={"detail": str(err)}) from err
             except asyncio.CancelledError:
                 self.async_set_updated_data(previous)
                 raise
